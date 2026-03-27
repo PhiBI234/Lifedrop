@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'create_account.dart';
 import 'home_screen.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -77,13 +77,24 @@ class _LoginScreenState extends State<LoginScreen> {
                       borderRadius: BorderRadius.circular(24),
                     ),
                   ),
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const HomePage(),
-                      ),
-                    );
+                  onPressed: () async {
+                    try {
+                      await FirebaseAuth.instance.signInWithEmailAndPassword(
+                        email: emailController.text.trim(),
+                        password: passwordController.text.trim(),
+                      );
+
+                      if (!mounted) return;
+
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const HomePage()),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Login failed: $e")),
+                      );
+                    }
                   },
                   child: const Text("Login"),
                 ),

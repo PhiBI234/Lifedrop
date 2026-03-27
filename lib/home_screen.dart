@@ -71,7 +71,7 @@ class HomePage extends StatelessWidget {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const UserProfile(), // replace with your actual page
+                    builder: (_) => UserProfile(), // replace with your actual page
                   ),
                 );
               },

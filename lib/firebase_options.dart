@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -28,15 +25,9 @@ class DefaultFirebaseOptions {
       case TargetPlatform.iOS:
         return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -64,6 +55,35 @@ class DefaultFirebaseOptions {
     projectId: 'lifedrop-405c7',
     storageBucket: 'lifedrop-405c7.firebasestorage.app',
     iosBundleId: 'com.example.lifedrop',
+  );
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAtVJCvmv7cJg_8mNxXFJzmkxduiYj9jQc',
+    appId: '1:986791753008:web:3b8316143a0d0d6ea044f5',
+    messagingSenderId: '986791753008',
+    projectId: 'lifedrop-405c7',
+    authDomain: 'lifedrop-405c7.firebaseapp.com',
+    storageBucket: 'lifedrop-405c7.firebasestorage.app',
+    measurementId: 'G-DQCS3VCSQL',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyC9gBXtdHpaAJhVb757tzBStD05c4Gk96s',
+    appId: '1:986791753008:ios:1d82f9f5f8827b9aa044f5',
+    messagingSenderId: '986791753008',
+    projectId: 'lifedrop-405c7',
+    storageBucket: 'lifedrop-405c7.firebasestorage.app',
+    iosBundleId: 'com.example.lifedrop',
+  );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyAtVJCvmv7cJg_8mNxXFJzmkxduiYj9jQc',
+    appId: '1:986791753008:web:ab652e646c8ef555a044f5',
+    messagingSenderId: '986791753008',
+    projectId: 'lifedrop-405c7',
+    authDomain: 'lifedrop-405c7.firebaseapp.com',
+    storageBucket: 'lifedrop-405c7.firebasestorage.app',
+    measurementId: 'G-S0GZG2LKSL',
   );
 
 }
