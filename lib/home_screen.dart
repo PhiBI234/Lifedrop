@@ -2,96 +2,119 @@ import 'package:flutter/material.dart';
 import 'available_donors.dart';
 import 'rare_blood_groups.dart';
 import 'select_district_page.dart';
-import 'drawer_page.dart';
 import 'post_to_donate.dart';
 import 'request_for_blood.dart';
 import 'requests_for_blood.dart';
 import 'select_blood_group.dart';
+import 'drawer_page.dart';
 import 'user_profile.dart';
+
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    double buttonSize = 250; // square size for buttons
+
+    Widget buildButton(String imagePath, String title, VoidCallback onTap) {
+      return SizedBox(
+        width: buttonSize,
+        height: buttonSize,
+        child: ElevatedButton(
+          onPressed: onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero, // sharp corners
+            ),
+            padding: const EdgeInsets.all(10),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(imagePath, height: 120), // adjusted to fit square
+              const SizedBox(height: 8),
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 18, color: Colors.black),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       drawer: const DrawerPage(),
       appBar: AppBar(
         backgroundColor: const Color(0xff9f2026),
         iconTheme: const IconThemeData(color: Colors.white),
         centerTitle: true,
-        title: const Text("LifeDrop",
-          style: TextStyle(
-            color: Colors.white,
-          ),
+        title: const Text(
+          "LifeDrop",
+          style: TextStyle(color: Colors.white),
         ),
-
-          actions: [
-            Padding(
-              padding: const EdgeInsets.only(right: 15),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const UserProfile(),
-                    ),
-                  );
-                },
-                child: Image.asset(
-                  "assets/images/user_icon.png",
-                  height: 35,
-                ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: IconButton(
+              iconSize: 60,
+              padding: EdgeInsets.zero,
+              icon: SizedBox(
+                height: 60, // actual image height
+                width: 60,  // keep square
+                child: Image.asset("assets/images/user_icon.png"),
               ),
+              onPressed: () {
+                // Navigate to the user/profile page
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const UserProfile(), // replace with your actual page
+                  ),
+                );
+              },
             ),
-          ],
-
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15),
-              child: GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: 1,
-                crossAxisSpacing: 8, //column
-
-                mainAxisSpacing: 8, //row
+              // First row (3 buttons)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  buildBorderedGridItem(
-                    context,
-                    "Available Donors",
+                  buildButton(
                     "assets/images/donor.png",
-                    onTap: () {
+                    "Available Donors",
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const SelectBloodGroupPage(),
-                        ),
+                            builder: (_) => const SelectBloodGroupPage()),
                       );
                     },
                   ),
-                  buildBorderedGridItem(
-                    context,
-                    "Requests",
+                  buildButton(
                     "assets/images/request.png",
-                    onTap: () {
+                    "Requests",
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (_) => const RequestsPage()),
                       );
                     },
                   ),
-                  buildBorderedGridItem(
-                    context,
-                    "Request For Blood",
+                  buildButton(
                     "assets/images/blood.png",
-                    onTap: () {
+                    "Request For Blood",
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -99,11 +122,19 @@ class HomePage extends StatelessWidget {
                       );
                     },
                   ),
-                  buildBorderedGridItem(
-                    context,
-                    "Post To Donate",
+                ],
+              ),
+
+              const SizedBox(height: 20),
+
+              // Second row (3 buttons)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  buildButton(
                     "assets/images/post.png",
-                    onTap: () {
+                    "Post To Donate",
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -111,11 +142,10 @@ class HomePage extends StatelessWidget {
                       );
                     },
                   ),
-                  buildBorderedGridItem(
-                    context,
-                    "Rare Blood Group",
+                  buildButton(
                     "assets/images/rare.png",
-                    onTap: () {
+                    "Rare Blood Group",
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -123,11 +153,10 @@ class HomePage extends StatelessWidget {
                       );
                     },
                   ),
-                  buildBorderedGridItem(
-                    context,
-                    "Nearby Hospital and Ambulance",
+                  buildButton(
                     "assets/images/hospital.png",
-                    onTap: () {
+                    "Nearby Hospital & Ambulance",
+                        () {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -137,56 +166,15 @@ class HomePage extends StatelessWidget {
                   ),
                 ],
               ),
-            ),
 
-            const SizedBox(height: 30),
+              const SizedBox(height: 30),
 
-            Image.asset(
-              "assets/images/chart.png",
-              height: 500,
-            ),
-
-            const SizedBox(height: 20),
-          ],
+              // Chart Image
+              Image.asset("assets/images/chart.png", height: 500),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget buildBorderedGridItem(BuildContext context, String title, String imagePath, {required VoidCallback onTap}) {
-    Color normalColor = Colors.white;
-    Color hoverColor = Colors.red.withOpacity(0.2);
-    ValueNotifier<bool> isHovering = ValueNotifier(false);
-
-    return MouseRegion(
-      onEnter: (_) => isHovering.value = true,
-      onExit: (_) => isHovering.value = false,
-      child: ValueListenableBuilder(
-        valueListenable: isHovering,
-        builder: (context, hovering, child) {
-          return GestureDetector(
-            onTap: onTap,
-            child: Container(
-              decoration: BoxDecoration(
-                color: hovering ? hoverColor : normalColor,
-                border: Border.all(color: Colors.grey),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Image.asset(imagePath, height: 130),
-                  const SizedBox(height: 8),
-                  Text(
-                    title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 18),
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
       ),
     );
   }
