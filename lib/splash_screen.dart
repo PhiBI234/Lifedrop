@@ -66,8 +66,8 @@ class _SplashScreenState extends State<SplashScreen>
               children: [
 
                 Image.asset(
-                  'assets/images/LifeDrop Logo.png',
-                  width: 400,   // ⚠️ 400 was too big
+                  'assets/images/lifedrop_logo.png',
+                  width: 200,   // ⚠️ 400 was too big
                 ),
 
                 const SizedBox(height: 20),
