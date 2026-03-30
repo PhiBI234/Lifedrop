@@ -27,145 +27,143 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFA61E22),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              const SizedBox(height: 60),
-              const Text(
-                "Create\nAccount",
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          children: [
+            const SizedBox(height: 60),
+            const Text(
+              "Create\nAccount",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
               ),
-              const SizedBox(height: 8),
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: const Text(
-                  "Already Registered? Log in here.",
-                  style: TextStyle(color: Colors.white70),
-                ),
+            ),
+            const SizedBox(height: 8),
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Text(
+                "Already Registered? Log in here.",
+                style: TextStyle(color: Colors.white70),
               ),
-              const SizedBox(height: 32),
-              buildTextField(nameController, "Full Name"),
-              const SizedBox(height: 16),
-              buildTextField(emailController, "Email"),
-              const SizedBox(height: 16),
-              buildTextField(phoneController, "Mobile Number"),
-              const SizedBox(height: 16),
-              buildTextField(districtController, "Address"),
-              const SizedBox(height: 16),
-              buildTextField(bloodGroupController, "Blood Group"),
-              const SizedBox(height: 16),
-              buildTextField(
-                passwordController,
-                "Password",
-                obscureText: !_isPasswordVisible,
-                isPassword: true,
-              ),
-              const SizedBox(height: 16),
-              buildTextField(
-                confirmPasswordController,
-                "Confirm Password",
-                obscureText: !_isConfirmPasswordVisible,
-                isConfirmPassword: true,
-              ),
-              const SizedBox(height: 32),
+            ),
+            const SizedBox(height: 32),
+            buildTextField(nameController, "Full Name"),
+            const SizedBox(height: 16),
+            buildTextField(emailController, "Email"),
+            const SizedBox(height: 16),
+            buildTextField(phoneController, "Mobile Number"),
+            const SizedBox(height: 16),
+            buildTextField(districtController, "Address"),
+            const SizedBox(height: 16),
+            buildTextField(bloodGroupController, "Blood Group"),
+            const SizedBox(height: 16),
+            buildTextField(
+              passwordController,
+              "Password",
+              obscureText: !_isPasswordVisible,
+              isPassword: true,
+            ),
+            const SizedBox(height: 16),
+            buildTextField(
+              confirmPasswordController,
+              "Confirm Password",
+              obscureText: !_isConfirmPasswordVisible,
+              isConfirmPassword: true,
+            ),
+            const SizedBox(height: 32),
 
-              // ✅ Sign Up Button wrapped in Builder for proper context
-              Builder(
-                builder: (contextButton) => SizedBox(
-                  width: 160,
-                  height: 48,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFF3E9E9),
-                      foregroundColor: Colors.black,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
+            // ✅ Sign Up Button wrapped in Builder for proper context
+            Builder(
+              builder: (contextButton) => SizedBox(
+                width: 160,
+                height: 48,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFFF3E9E9),
+                    foregroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
                     ),
-                    onPressed: () async {
-                      print("Sign Up button clicked");
+                  ),
+                  onPressed: () async {
+                    print("Sign Up button clicked");
 
-                      if (passwordController.text != confirmPasswordController.text) {
-                        ScaffoldMessenger.of(contextButton).showSnackBar(
-                          const SnackBar(content: Text("Passwords do not match")),
-                        );
-                        return;
-                      }
+                    if (passwordController.text != confirmPasswordController.text) {
+                      ScaffoldMessenger.of(contextButton).showSnackBar(
+                        const SnackBar(content: Text("Passwords do not match")),
+                      );
+                      return;
+                    }
 
-                      String email = emailController.text.trim();
-                      String password = passwordController.text.trim();
+                    String email = emailController.text.trim();
+                    String password = passwordController.text.trim();
 
-                      try {
-                        // Try to create a new user
-                        UserCredential userCredential = await FirebaseAuth.instance
-                            .createUserWithEmailAndPassword(email: email, password: password);
+                    try {
+                      // Try to create a new user
+                      UserCredential userCredential = await FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(email: email, password: password);
 
-                        print("User created: ${userCredential.user!.email}");
+                      print("User created: ${userCredential.user!.email}");
 
-                        // Save extra info to Firestore
-                        await FirebaseFirestore.instance
-                            .collection('users')
-                            .doc(userCredential.user!.uid)
-                            .set({
-                          'name': nameController.text.trim(),
-                          'email': email,
-                          'phone': phoneController.text.trim(),
-                          'district': districtController.text.trim(),
-                          'bloodGroup': bloodGroupController.text.trim(),
-                        });
-                      } on FirebaseAuthException catch (e) {
-                        print("FirebaseAuthException: ${e.code}");
+                      // Save extra info to Firestore
+                      await FirebaseFirestore.instance
+                          .collection('users')
+                          .doc(userCredential.user!.uid)
+                          .set({
+                        'name': nameController.text.trim(),
+                        'email': email,
+                        'phone': phoneController.text.trim(),
+                        'district': districtController.text.trim(),
+                        'bloodGroup': bloodGroupController.text.trim(),
+                      });
+                    } on FirebaseAuthException catch (e) {
+                      print("FirebaseAuthException: ${e.code}");
 
-                        if (e.code == 'email-already-in-use') {
-                          // Existing user → sign in
-                          try {
-                            UserCredential userCredential = await FirebaseAuth.instance
-                                .signInWithEmailAndPassword(email: email, password: password);
-                            print("Signed in existing user: ${userCredential.user!.email}");
-                          } on FirebaseAuthException catch (e) {
-                            print("Sign in failed: ${e.message}");
-                            ScaffoldMessenger.of(contextButton).showSnackBar(
-                              SnackBar(content: Text("Sign in failed: ${e.message}")),
-                            );
-                            return;
-                          }
-                        } else {
+                      if (e.code == 'email-already-in-use') {
+                        // Existing user → sign in
+                        try {
+                          UserCredential userCredential = await FirebaseAuth.instance
+                              .signInWithEmailAndPassword(email: email, password: password);
+                          print("Signed in existing user: ${userCredential.user!.email}");
+                        } on FirebaseAuthException catch (e) {
+                          print("Sign in failed: ${e.message}");
                           ScaffoldMessenger.of(contextButton).showSnackBar(
-                            SnackBar(content: Text("Error: ${e.message}")),
+                            SnackBar(content: Text("Sign in failed: ${e.message}")),
                           );
                           return;
                         }
-                      } catch (e) {
-                        print("Other error: $e");
+                      } else {
                         ScaffoldMessenger.of(contextButton).showSnackBar(
-                          SnackBar(content: Text("Error: $e")),
+                          SnackBar(content: Text("Error: ${e.message}")),
                         );
                         return;
                       }
-
-                      // ✅ Navigate to HomePage
-                      print("Navigating to HomePage...");
-                      Navigator.pushReplacement(
-                        contextButton,
-                        MaterialPageRoute(builder: (_) => const HomePage()),
+                    } catch (e) {
+                      print("Other error: $e");
+                      ScaffoldMessenger.of(contextButton).showSnackBar(
+                        SnackBar(content: Text("Error: $e")),
                       );
-                    },
-                    child: const Text("Sign up"),
-                  ),
+                      return;
+                    }
+
+                    // ✅ Navigate to HomePage
+                    print("Navigating to HomePage...");
+                    Navigator.pushReplacement(
+                      contextButton,
+                      MaterialPageRoute(builder: (_) => const HomePage()),
+                    );
+                  },
+                  child: const Text("Sign up"),
                 ),
               ),
-            ],
-          ),
-        ),git
+            ),
+          ],
+        ),
       ),
     );
   }

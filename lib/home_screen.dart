@@ -157,11 +157,10 @@ class HomePage extends StatelessWidget {
                     "assets/images/hospital.png",
                     "Nearby Hospital & Ambulance",
                         () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const SelectDistrictPage()),
-                      );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const SelectBloodGroupPage()),
+                          );
                     },
                   ),
                 ],
