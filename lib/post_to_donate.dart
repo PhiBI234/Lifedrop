@@ -1,7 +1,79 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class PostToDonatePage extends StatelessWidget {
+class PostToDonatePage extends StatefulWidget {
   const PostToDonatePage({super.key});
+
+  @override
+  State<PostToDonatePage> createState() => _PostToDonatePageState();
+}
+
+class _PostToDonatePageState extends State<PostToDonatePage> {
+
+  final nameController = TextEditingController();
+  final addressController = TextEditingController();
+  final phoneController = TextEditingController();
+  final dateController = TextEditingController();
+
+  String selectedDistrict = "Dhaka";
+  String selectedBlood = "A+";
+  String selectedGender = "Male";
+
+  bool isLoading = false;  // ← ADDED
+
+  Future<void> postData() async {
+    // Validation
+    if (nameController.text.trim().isEmpty ||
+        addressController.text.trim().isEmpty ||
+        phoneController.text.trim().isEmpty ||
+        dateController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Please fill all fields")),
+      );
+      return;
+    }
+
+    setState(() => isLoading = true);  // ← show loading
+
+    try {
+      await FirebaseFirestore.instance.collection('donors').add({
+        'name': nameController.text.trim(),
+        'address': addressController.text.trim(),
+        'phone': phoneController.text.trim(),
+        'date': dateController.text.trim(),
+        'district': selectedDistrict,
+        'blood': selectedBlood,
+        'gender': selectedGender,
+        'time': FieldValue.serverTimestamp(),
+        'userId': FirebaseAuth.instance.currentUser?.uid ?? 'anonymous',
+      });
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Posted Successfully!")),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: $e")),  // ← shows real error
+        );
+      }
+    } finally {
+      if (mounted) setState(() => isLoading = false);
+    }
+  }
+
+  @override
+  void dispose() {
+    nameController.dispose();
+    addressController.dispose();
+    phoneController.dispose();
+    dateController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,18 +81,9 @@ class PostToDonatePage extends StatelessWidget {
       backgroundColor: const Color(0xff9f2026),
       appBar: AppBar(
         backgroundColor: const Color(0xff9f2026),
-        elevation: 0,
-        leading: IconButton(icon: const Icon(Icons.arrow_back, color:Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          }
-          ),
-
-
-        title: const Text(
-          "POST TO DONATE",
-          style: TextStyle( color:Colors.white),
-        ),
+        iconTheme: const IconThemeData(color: Colors.white),
+        title: const Text("POST TO DONATE",
+            style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
       body: Center(
@@ -35,58 +98,63 @@ class PostToDonatePage extends StatelessWidget {
             child: Column(
               children: [
 
-                // Full Name
                 TextField(
-                  decoration: InputDecoration(
-                    hintText: "Full Name",
-                  ),
+                  controller: nameController,
+                  decoration: const InputDecoration(hintText: "Full Name"),
                 ),
 
                 const SizedBox(height: 15),
 
-                // Address
                 TextField(
-                  decoration: InputDecoration(
-                    hintText: "Address",
-                  ),
+                  controller: addressController,
+                  decoration: const InputDecoration(hintText: "Address"),
                 ),
 
                 const SizedBox(height: 15),
 
-                // Select District
-                buildDropdown("Select District"),
-
-                const SizedBox(height: 15),
-
-                // Select Blood Group
-                buildDropdown("Select Blood Group"),
-
-                const SizedBox(height: 15),
-
-                // Select Gender
-                buildDropdown("Select Gender"),
-
-                const SizedBox(height: 15),
-
-                // Phone No
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Phone No",
-                  ),
+                buildDropdown(
+                  "District",
+                  ["Dhaka", "Chittagong", "Khulna"],
+                  selectedDistrict,
+                      (val) => setState(() => selectedDistrict = val!),
                 ),
 
                 const SizedBox(height: 15),
 
-                // Last Donation Date
-                TextField(
-                  decoration: InputDecoration(
-                    hintText: "Last Donation Date",
-                  ),
+                buildDropdown(
+                  "Blood Group",
+                  ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
+                  selectedBlood,
+                      (val) => setState(() => selectedBlood = val!),
                 ),
 
-                const SizedBox(height: 40),
+                const SizedBox(height: 15),
 
-                // Post Button
+                buildDropdown(
+                  "Gender",
+                  ["Male", "Female"],
+                  selectedGender,
+                      (val) => setState(() => selectedGender = val!),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: phoneController,
+                  keyboardType: TextInputType.phone,
+                  decoration: const InputDecoration(hintText: "Phone No"),
+                ),
+
+                const SizedBox(height: 15),
+
+                TextField(
+                  controller: dateController,
+                  decoration: const InputDecoration(
+                      hintText: "Last Donation Date (e.g. 31-01-2026)"),
+                ),
+
+                const SizedBox(height: 30),
+
                 SizedBox(
                   width: double.infinity,
                   height: 50,
@@ -94,11 +162,11 @@ class PostToDonatePage extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff9f2026),
                     ),
-                    onPressed: () {},
-                    child: const Text(
-                      "Post",
-                      style: TextStyle(fontSize: 18, color:Colors.white),
-                    ),
+                    onPressed: isLoading ? null : postData,  // ← FIXED
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)  // ← FIXED
+                        : const Text("Post",
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ),
 
@@ -110,15 +178,19 @@ class PostToDonatePage extends StatelessWidget {
     );
   }
 
-  // Simple reusable dropdown UI
-  Widget buildDropdown(String hint) {
-    return DropdownButtonFormField(
+  Widget buildDropdown(String hint, List<String> items, String value,
+      Function(String?) onChanged) {
+    return DropdownButtonFormField<String>(
+      value: value,
       decoration: InputDecoration(
-        hintText: hint,
-        border: OutlineInputBorder(),
+        labelText: hint,
+        border: const OutlineInputBorder(),
       ),
-      items: const [],
-      onChanged: (value) {},
+      items: items
+          .map((item) =>
+          DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
+      onChanged: onChanged,
     );
   }
 }
