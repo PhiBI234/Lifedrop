@@ -1,81 +1,70 @@
 import 'package:flutter/material.dart';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 class HospitalPage extends StatelessWidget {
-  const HospitalPage({super.key});
+  final String selectedBloodGroup;
+  final String selectedDistrict;
+
+  const HospitalPage({
+    super.key,
+    required this.selectedBloodGroup,
+    required this.selectedDistrict,
+  });
 
   @override
   Widget build(BuildContext context) {
+    print("Querying for BloodGroup=$selectedBloodGroup, District=$selectedDistrict");
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: const Color(0xff9f2026),
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        title: const Text(
-          "Hospitals And Ambulance Services",
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
+        title: const Text("Hospitals & Ambulance Services", style: TextStyle(color: Colors.white)),
         centerTitle: true,
       ),
-      body: ListView(
-        children: [
-          buildService(
-            "Lab Scan Ambulance Service",
-            "01234567890",
-            "Mohammad Ali Road, Cumilla",
-          ),
-          buildService(
-            "Mayer Doa Ambulance Service",
-            "01234567890",
-            "Cumilla",
-          ),
-          buildService(
-            "Ad-din Women’s Medical College",
-            "01234567890",
-            "Modhupukur, Cumilla",
-          ),
-          buildService(
-            "Cumilla Medical College Hospital",
-            "01234567891",
-            "Shalbagan, Cumilla",
-          ),
-          buildService(
-            "Al-Haj Hospital & Diagnostic Center",
-            "01234567892",
-            "GEC, Cumilla",
-          ),
-          buildService(
-            "Ananda Hospital & Diagnostics",
-            "01234567893",
-            "Kotbari, Cumilla",
-          ),
-          buildService(
-            "Cumilla Ambulance Service",
-            "01234567894",
-            "District Hospital Road, Cumilla",
-          ),
-          buildService(
-            "Bashundhara Hospital",
-            "01234567895",
-            "Shalbagan, Cumilla",
-          ),
-        ],
-      ),
-    );
-  }
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('services')
+            .where('bloodGroup', isEqualTo: selectedBloodGroup)
+            .where('district', isEqualTo: selectedDistrict)
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-  Widget buildService(String name, String phone, String location) {
-    return ListTile(
-      leading: const Icon(Icons.local_hospital, color: Color(0xff9f2026), size :50),
-      title: Text(name),
-      subtitle: Text("$location\n$phone"),
-      isThreeLine: true,
-      trailing: const Icon(Icons.call, color: Color(0xff9f2026), size: 50),
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("No hospitals available"));
+          }
+
+          final hospitals = snapshot.data!.docs;
+
+          return ListView.builder(
+            itemCount: hospitals.length,
+            itemBuilder: (context, index) {
+              final data = hospitals[index].data() as Map<String, dynamic>;
+              return ListTile(
+                leading: const Icon(Icons.local_hospital, color: Color(0xff9f2026), size: 50),
+                title: Text(data['name'] ?? ''),
+                subtitle: Text("${data['location'] ?? ''}\n${data['phone'] ?? ''}"),
+                isThreeLine: true,
+                trailing: IconButton(
+                  icon: const Icon(Icons.call, color: Color(0xff9f2026), size: 30),
+                  onPressed: () {
+                    final phone = data['phone'] ?? '';
+                    if (phone.isNotEmpty) {
+                      // Placeholder: real call works on mobile with url_launcher
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Call: $phone")),
+                      );
+                    }
+                  },
+                ),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 }

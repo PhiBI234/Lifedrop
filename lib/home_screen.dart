@@ -5,7 +5,6 @@ import 'select_district_page.dart';
 import 'post_to_donate.dart';
 import 'request_for_blood.dart';
 import 'requests_for_blood.dart';
-import 'select_blood_group.dart';
 import 'drawer_page.dart';
 import 'user_profile.dart';
 
@@ -14,7 +13,7 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double buttonSize = 250; // square size for buttons
+    double buttonSize = 250;
 
     Widget buildButton(String imagePath, String title, VoidCallback onTap) {
       return SizedBox(
@@ -25,14 +24,14 @@ class HomePage extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: Colors.white,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.zero, // sharp corners
+              borderRadius: BorderRadius.zero,
             ),
             padding: const EdgeInsets.all(10),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Image.asset(imagePath, height: 120), // adjusted to fit square
+              Image.asset(imagePath, height: 120),
               const SizedBox(height: 8),
               Text(
                 title,
@@ -62,17 +61,14 @@ class HomePage extends StatelessWidget {
               iconSize: 60,
               padding: EdgeInsets.zero,
               icon: SizedBox(
-                height: 60, // actual image height
-                width: 60,  // keep square
+                height: 60,
+                width: 60,
                 child: Image.asset("assets/images/user_icon.png"),
               ),
               onPressed: () {
-                // Navigate to the user/profile page
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => UserProfile(), // replace with your actual page
-                  ),
+                  MaterialPageRoute(builder: (_) => UserProfile()),
                 );
               },
             ),
@@ -86,7 +82,6 @@ class HomePage extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
 
-              // First row (3 buttons)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -97,7 +92,8 @@ class HomePage extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (_) => const SelectBloodGroupPage()),
+                          builder: (_) => const AvailableDonorsPage(), // ← FIXED
+                        ),
                       );
                     },
                   ),
@@ -127,7 +123,6 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Second row (3 buttons)
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -157,11 +152,7 @@ class HomePage extends StatelessWidget {
                     "assets/images/hospital.png",
                     "Nearby Hospital & Ambulance",
                         () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => const SelectDistrictPage()),
-                      );
+                      // Hospital page - add later
                     },
                   ),
                 ],
@@ -169,7 +160,6 @@ class HomePage extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Chart Image
               Image.asset("assets/images/chart.png", height: 500),
               const SizedBox(height: 20),
             ],
